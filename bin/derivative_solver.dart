@@ -19,11 +19,15 @@ class Token {
   TokenType type;
   dynamic value;
   Token(this.type, this.value);
-  bool couldImplicitlyBeOperator() {
+  bool couldImplicitlyBeLeftOperator() {
     return type == TokenType.number ||
         type == TokenType.variable ||
-        type == TokenType.leftParenthesis ||
         type == TokenType.rightParenthesis;
+  }
+  bool couldImplicitlyBeRightOperator() {
+    return type == TokenType.number ||
+        type == TokenType.variable ||
+        type == TokenType.leftParenthesis;
   }
   static List<Token> fromString(String s) {
     var tokens = <Token>[];
@@ -64,9 +68,11 @@ class Token {
     }
     // now we need to check for implicit multiplication and add the multiplication tokens
     // (think 10x implies multiplication, so a num or variable both could implicitly be an operator)
+    // we need to diffrentiate between left and right operators because
+    // (1 does not imply (*1, but 1( does imply 1*(
     for (int i=0; i<tokens.length; ++i) {
-      if (tokens[i].couldImplicitlyBeOperator()) {
-        if (i > 0 && tokens[i-1].couldImplicitlyBeOperator()) {
+      if (tokens[i].couldImplicitlyBeRightOperator()) {
+        if (i > 0 && tokens[i-1].couldImplicitlyBeLeftOperator()) {
           tokens.insert(i, Token(TokenType.times, '*'));
         }
       }
