@@ -1,1 +1,1 @@
-A simple command-line application.
+A simple cli derivative finder written in Dart
